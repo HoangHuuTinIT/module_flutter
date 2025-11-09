@@ -5,20 +5,23 @@ import '../networking/api_service.dart';
 import 'controller.dart';
 
 class CollectionsController extends Controller {
-  CollectionsController._privateConstructor();
-  static final CollectionsController _instance = CollectionsController._privateConstructor();
-  static CollectionsController get instance => _instance;
+  CollectionsController();
 
   final ValueNotifier<List<Collection>> allCollections = ValueNotifier([]);
   int _allCollectionsPage = 1;
-  bool isLoadingMoreCollections = false;
+
+  // ĐÃ SỬA: Biến `isLoadingMoreCollections` thành một ValueNotifier
+  final ValueNotifier<bool> isLoadingMoreCollections = ValueNotifier(false);
+
   bool _hasMoreCollections = true;
 
   Future<void> fetchInitialCollections() async {
     allCollections.value = [];
     _allCollectionsPage = 1;
     _hasMoreCollections = true;
-    isLoadingMoreCollections = false;
+
+    // ĐÃ SỬA: Dùng .value
+    isLoadingMoreCollections.value = false;
 
     List<Collection>? initialCollections = await api<ApiService>(
             (request) => request.fetchAllCollections(page: _allCollectionsPage));
@@ -32,10 +35,13 @@ class CollectionsController extends Controller {
   }
 
   Future<void> fetchMoreCollections() async {
-    if (isLoadingMoreCollections || !_hasMoreCollections) return;
+    // ĐÃ SỬA: Dùng .value
+    if (isLoadingMoreCollections.value || !_hasMoreCollections) return;
 
-    isLoadingMoreCollections = true;
-    allCollections.notifyListeners();
+    // ĐÃ SỬA: Dùng .value
+    isLoadingMoreCollections.value = true;
+
+    // ĐÃ XÓA: allCollections.notifyListeners(); // Không cần thiết nữa
 
     _allCollectionsPage++;
 
@@ -51,7 +57,8 @@ class CollectionsController extends Controller {
       _hasMoreCollections = false;
     }
 
-    isLoadingMoreCollections = false;
+    // ĐÃ SỬA: Dùng .value
+    isLoadingMoreCollections.value = false;
   }
 
   void handleCollectionsScroll(ScrollController scrollController) {

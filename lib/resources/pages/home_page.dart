@@ -103,7 +103,20 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
         child: SafeArea(child: TabBar(controller: _tabController, onTap: (index) { if (index == 0) { widget.controller.scrollToTop(_homeScrollController); } }, labelColor: Colors.black, indicatorColor: Colors.black, indicatorSize: TabBarIndicatorSize.tab, indicatorWeight: 3, labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: screenWidth * 0.04,), unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: screenWidth * 0.04,), tabs: const [Tab(text: "HOME"), Tab(text: "COLLECTIONS"),],),),
       ),
       body: TabBarView(
-        controller: _tabController, physics: const NeverScrollableScrollPhysics(), children: [_buildHomeTab(), CollectionsPage(),],
+        controller: _tabController, physics: const NeverScrollableScrollPhysics(), children: [ValueListenableBuilder<List<Photo>>(
+        valueListenable: widget.controller.photos,
+        builder: (context, photoList, child) {
+          // Lồng builder thứ 2 để lắng nghe isLoadingMorePhotos
+          return ValueListenableBuilder<bool>(
+            valueListenable: widget.controller.isLoadingMorePhotos,
+            builder: (context, isLoadingMore, child) {
+              // Gọi hàm build body với cả hai giá trị state
+              return _buildHomeTabBody(photoList, isLoadingMore);
+            },
+          );
+        },
+      ),
+        CollectionsPage(),],
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -161,28 +174,25 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
   void _onIconTapped(int index) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar(); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tapped on icon index $index'), duration: const Duration(seconds: 1), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),),);
   }
+  Widget _buildHomeTabBody(List<Photo> photoList, bool isLoadingMore) {
+    final listVerticalPadding = MediaQuery.of(context).size.height * 0.02;
+    final listBottomPadding = _bottomNavBarHeight + 20;
 
-  Widget _buildHomeTab() {
-    final listVerticalPadding = MediaQuery.of(context).size.height * 0.02; final listBottomPadding = _bottomNavBarHeight + 20;
+    if (photoList.isEmpty && !isLoadingMore) {
+      return Center(child: LoadingAnimationWidget.fourRotatingDots(color: Colors.grey.shade400, size: 50,),);
+    }
 
-    return ValueListenableBuilder<List<Photo>>(
-      valueListenable: widget.controller.photos,
-      builder: (context, photoList, child) {
-        if (photoList.isEmpty && !widget.controller.isLoadingMorePhotos) {
-          return Center(child: LoadingAnimationWidget.fourRotatingDots(color: Colors.grey.shade400, size: 50,),);
+    return ListView.builder(
+      padding: EdgeInsets.only(bottom: listBottomPadding, top: listVerticalPadding),
+      controller: _homeScrollController,
+      // ĐÃ SỬA: Dùng biến `isLoadingMore` từ builder
+      itemCount: photoList.length + (isLoadingMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= photoList.length) {
+          return const Padding(padding: EdgeInsets.all(16.0), child: Center(child: CircularProgressIndicator(color: Colors.black)),);
         }
-        return ListView.builder(
-          padding: EdgeInsets.only(bottom: listBottomPadding, top: listVerticalPadding),
-          controller: _homeScrollController,
-          itemCount: photoList.length + (widget.controller.isLoadingMorePhotos ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index >= photoList.length) {
-              return const Padding(padding: EdgeInsets.all(16.0), child: Center(child: CircularProgressIndicator(color: Colors.black)),);
-            }
-            final photo = photoList[index];
-            return PhotoListItem(photo: photo);
-          },
-        );
+        final photo = photoList[index];
+        return PhotoListItem(photo: photo);
       },
     );
   }

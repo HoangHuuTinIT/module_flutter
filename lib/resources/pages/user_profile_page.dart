@@ -1,11 +1,16 @@
+// lib/resources/pages/user_profile_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/user_profile_controller.dart';
 import '../../app/models/user_detail.dart';
+import '../../app/controllers/user_profile_state.dart';
 import '../widgets/user_collections_tab.dart';
 import '../widgets/user_likes_tab.dart';
 import '../widgets/user_photos_tab.dart';
+// Có thể bạn cần import widget này
+import '../widgets/empty_state_widget.dart';
 
 class UserProfilePage extends NyStatefulWidget<UserProfileController> {
   static RouteView path = ("/user-profile", (_) => UserProfilePage());
@@ -19,7 +24,8 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
     String? username = widget.data();
     if (username != null) {
       await widget.controller.fetchUserDetails(username);
-      if (mounted) {
+      if (mounted && widget.controller.userProfileState.value.errorMessage == null) {
+        // Chỉ fetch tab data nếu không có lỗi ở bước trước
         widget.controller.fetchTabsData(username);
       }
     }
@@ -30,10 +36,27 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
   Widget view(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ValueListenableBuilder<bool>(
-        valueListenable: widget.controller.isUserLoading,
-        builder: (context, isUserLoading, child) {
-          if (isUserLoading || widget.controller.userDetail.value == null) {
+      body: ValueListenableBuilder<UserProfileState>(
+        valueListenable: widget.controller.userProfileState,
+        builder: (context, state, child) {
+
+          // ĐÃ THÊM: Ưu tiên kiểm tra lỗi trước
+          if (state.errorMessage != null && !state.isUserLoading) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                // Bạn có thể dùng EmptyStateWidget hoặc 1 Text đơn giản
+                child: Text(
+                  state.errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.red),
+                ),
+              ),
+            );
+          }
+
+          // Kiểm tra loading (như cũ)
+          if (state.isUserLoading || state.userDetail == null) {
             return Center(
               child: LoadingAnimationWidget.fourRotatingDots(
                 color: Colors.grey.shade400,
@@ -41,17 +64,21 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
               ),
             );
           }
-          return _buildUserProfile(context, widget.controller.userDetail.value!);
+
+          // Hiển thị nội dung (như cũ)
+          return _buildUserProfile(context, state.userDetail!);
         },
       ),
     );
   }
+
   Widget _buildUserProfile(BuildContext context, UserDetail user) {
     final controller = widget.controller;
     return DefaultTabController(
       length: 3,
       child: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          // ... (Giữ nguyên SliverAppBar, SliverToBoxAdapter, SliverPersistentHeader) ...
           return <Widget>[
             SliverAppBar(
               backgroundColor: Colors.white,
@@ -92,10 +119,13 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
             ),
           ];
         },
-        body: ValueListenableBuilder<bool>(
-          valueListenable: controller.isTabsLoading,
-          builder: (context, isTabsLoading, child) {
-            if (isTabsLoading) {
+        body: ValueListenableBuilder<UserProfileState>(
+          valueListenable: controller.userProfileState,
+          builder: (context, state, child) {
+
+            // ĐÃ THÊM: Kiểm tra lỗi tải tab
+            // (Chúng ta có thể hiện lỗi ở đây, hoặc để các tab tự xử lý)
+            if (state.isTabsLoading) {
               return Center(
                 child: LoadingAnimationWidget.staggeredDotsWave(
                   color: Colors.grey.shade400,
@@ -103,6 +133,12 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
                 ),
               );
             }
+
+            // Nếu lỗi xảy ra ở fetchTabsData, state.errorMessage sẽ không null
+            // nhưng chúng ta vẫn muốn hiển thị các tab
+            // (Một cách xử lý tốt hơn là mỗi tab có trạng thái lỗi riêng)
+            // Hiện tại, chúng ta cứ hiển thị TabBarView
+
             return TabBarView(
               children: [
                 UserPhotosTab(controller: controller),
@@ -116,6 +152,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
     );
   }
 
+  // ... (Các hàm _buildHeader, _buildStatColumn, _formatNumber, _SliverAppBarDelegate giữ nguyên) ...
   Widget _buildHeader(BuildContext context, UserDetail user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -216,4 +253,4 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
   }
-  }
+}

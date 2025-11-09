@@ -13,7 +13,6 @@ final Map<Type, dynamic> modelDecoders = {
   List<User>: (data) =>
       List.from(data).map((json) => User.fromJson(json)).toList(),
 
-  // Thêm các model mới vào đây
   Photo: (data) => Photo.fromJson(data),
   List<Photo>: (data) =>
       List.from(data).map((json) => Photo.fromJson(json)).toList(),
@@ -29,9 +28,9 @@ final Map<Type, dynamic> apiDecoders = {
 };
 
 final Map<Type, dynamic> controllers = {
-  HomeController: () => HomeController.instance,
+  HomeController: () => HomeController(),
   PhotoDetailPageController: () => PhotoDetailPageController(),
-  UserProfileController: () => UserProfileController.instance,
-  CollectionsController: () => CollectionsController.instance,
+  UserProfileController: () => UserProfileController(),
+  CollectionsController: () => CollectionsController(),
   CollectionDetailController: () => CollectionDetailController(),
 };

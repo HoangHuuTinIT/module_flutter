@@ -1,7 +1,10 @@
+// lib/resources/widgets/user_photos_tab.dart
+
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-
 import '../../app/controllers/user_profile_controller.dart';
+// IMPORT STATE MỚI
+import '../../app/controllers/user_profile_state.dart';
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/photo.dart';
 
@@ -14,6 +17,7 @@ class UserPhotosTab extends StatefulWidget {
 }
 
 class _UserPhotosTabState extends State<UserPhotosTab> {
+  // ... (initState, dispose, _onScroll giữ nguyên) ...
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -36,12 +40,19 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<Photo>>(
-      valueListenable: widget.controller.userPhotos,
-      builder: (context, photos, _) {
-        if (photos.isEmpty && !widget.controller.isLoadingMoreUserPhotos) {
+    // ĐÃ SỬA: Lắng nghe controller.state
+    return ValueListenableBuilder<UserProfileState>(
+      // ĐÃ SỬA: Đổi tên thành 'userProfileState'
+      valueListenable: widget.controller.userProfileState,
+      builder: (context, state, _) {
+        // ĐÃ SỬA: Lấy photos và isLoadingMore từ state
+        final photos = state.userPhotos;
+        final isLoadingMore = state.isLoadingMoreUserPhotos;
+
+        if (photos.isEmpty && !isLoadingMore) {
           return Center(
               child:
               Text("No photos found.", style: TextStyle(color: Colors.grey)));
@@ -50,7 +61,8 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
         return ListView.builder(
           controller: _scrollController,
           padding: EdgeInsets.symmetric(vertical: 8),
-          itemCount: photos.length + (widget.controller.isLoadingMoreUserPhotos ? 1 : 0),
+          // ĐÃ SỬA: Dùng biến isLoadingMore
+          itemCount: photos.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index >= photos.length) {
               return Padding(
@@ -59,6 +71,7 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
               );
             }
 
+            // ... (code còn lại giữ nguyên) ...
             final photo = photos[index];
             final double aspectRatio = (photo.width != null &&
                 photo.height != null &&

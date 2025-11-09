@@ -1,3 +1,5 @@
+// lib/resources/pages/collections_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -34,32 +36,42 @@ class _CollectionsPageState extends NyPage<CollectionsPage> {
 
   @override
   Widget view(BuildContext context) {
+    // ĐÃ SỬA: Lồng 2 ValueListenableBuilder
     return ValueListenableBuilder<List<Collection>>(
         valueListenable: widget.controller.allCollections,
         builder: (context, collections, _) {
-          if (collections.isEmpty && !widget.controller.isLoadingMoreCollections) {
-            return Center(
-              child: LoadingAnimationWidget.fourRotatingDots(
-                color: Colors.grey.shade400,
-                size: 50,
-              ),
-            );
-          }
+          // Lồng builder thứ 2
+          return ValueListenableBuilder<bool>(
+            valueListenable: widget.controller.isLoadingMoreCollections,
+            builder: (context, isLoadingMore, _) {
 
-          return ListView.builder(
-            controller: _scrollController,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            itemCount: collections.length +
-                (widget.controller.isLoadingMoreCollections ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index >= collections.length) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                      child: CircularProgressIndicator(color: Colors.black)),
+              // Logic kiểm tra loading ban đầu
+              if (collections.isEmpty && !isLoadingMore) {
+                return Center(
+                  child: LoadingAnimationWidget.fourRotatingDots(
+                    color: Colors.grey.shade400,
+                    size: 50,
+                  ),
                 );
               }
-              return HomeCollectionItem(collection: collections[index]);
+
+              return ListView.builder(
+                controller: _scrollController,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+
+                // ĐÃ SỬA: Dùng biến `isLoadingMore` từ builder
+                itemCount: collections.length + (isLoadingMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= collections.length) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                          child: CircularProgressIndicator(color: Colors.black)),
+                    );
+                  }
+                  return HomeCollectionItem(collection: collections[index]);
+                },
+              );
             },
           );
         });
