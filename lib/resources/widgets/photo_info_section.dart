@@ -1,3 +1,5 @@
+// lib/resources/widgets/photo_info_section.dart
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -5,6 +7,8 @@ import 'package:nylo_framework/nylo_framework.dart';
 
 import '../../app/controllers/photo_detail_page_controller.dart';
 import '../../app/models/photo.dart';
+import '../../app/controllers/photo_detail_state.dart';
+import '../../constants/app_dimensions.dart'; // IMPORT STATE MỚI
 
 class PhotoInfoSection extends StatefulWidget {
   final PhotoDetailPageController controller;
@@ -19,28 +23,44 @@ class PhotoInfoSection extends StatefulWidget {
 }
 
 class _PhotoInfoSectionState extends State<PhotoInfoSection> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.fetchFullDetails();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // ĐÃ XÓA: Controller tự gọi fetchFullDetails từ page
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Photo?>(
-      valueListenable: widget.controller.photoNotifier,
-      builder: (context, detailedPhoto, child) {
-        final currentPhoto = detailedPhoto ?? widget.initialPhoto;
+    // ĐÃ SỬA: Lắng nghe PhotoDetailState
+    return ValueListenableBuilder<PhotoDetailState>(
+      valueListenable: widget.controller.photoState,
+      builder: (context, state, child) {
+
+        // Hiển thị lỗi nếu có
+        if (state.errorMessage != null) {
+          return Padding(
+            padding: const EdgeInsets.all(kSpacingXLarge),
+            child: Center(
+              child: Text(
+                state.errorMessage!,
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          );
+        }
+
+        // Dùng state.hasLoadedDetails để quyết định
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 500),
-          child: currentPhoto.exif == null
+          child: !state.hasLoadedDetails
               ? _buildSkeleton(context, widget.initialPhoto)
-              : _buildContent(context, currentPhoto),
+              : _buildContent(context, state.photo ?? widget.initialPhoto),
         );
       },
     );
   }
 
+  // ... (Tất cả các hàm _buildSkeleton, _buildContent, _buildUserInfo, v.v. giữ nguyên) ...
   Widget _buildSkeleton(BuildContext context, Photo initialPhoto) {
     Widget buildPlaceholder(double width, double height, {double radius = 8}) {
       return Container(
@@ -55,17 +75,17 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
 
     return Padding(
       key: const ValueKey('skeleton'),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingLarge, vertical: kSpacingXLarge),
       child: Column(
         children: [
           Row(
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: kAvatarRadiusMedium,
                 backgroundImage:
-                    NetworkImage(initialPhoto.user?.profileImage?.medium ?? ""),
+                NetworkImage(initialPhoto.user?.profileImage?.medium ?? ""),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: kSpacingMedium),
               Expanded(
                 child: Text(
                   initialPhoto.user?.name ?? "",
@@ -76,23 +96,23 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
                 ),
               ),
               buildPlaceholder(24, 24, radius: 12),
-              const SizedBox(width: 16),
+              const SizedBox(width: kSpacingLarge),
               buildPlaceholder(24, 24, radius: 12),
-              const SizedBox(width: 16),
+              const SizedBox(width: kSpacingLarge),
               buildPlaceholder(24, 24, radius: 12),
             ],
           ),
-          const Divider(height: 40, thickness: 1),
+          const Divider(height: kSpacingHuge, thickness: 1),
           Column(
             children: [
               Row(
                 children: [
                   Expanded(child: buildPlaceholder(double.infinity, 30)),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: kSpacingXXLarge),
                   Expanded(child: buildPlaceholder(double.infinity, 30)),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(width: kSpacingXXLarge),
               Row(
                 children: [
                   Expanded(child: buildPlaceholder(double.infinity, 30)),
@@ -102,13 +122,13 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
               ),
             ],
           ),
-          const Divider(height: 40, thickness: 1),
+          const Divider(height: kSpacingHuge, thickness: 1),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            padding: const EdgeInsets.symmetric(vertical: kSpacingXLarge),
             child: Center(
               child: LoadingAnimationWidget.fourRotatingDots(
                 color: Colors.grey.shade400,
-                size: 40,
+                size: kSpacingHuge,
               ),
             ),
           ),
@@ -116,20 +136,21 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
       ),
     );
   }
+
   Widget _buildContent(BuildContext context, Photo photo) {
     return Padding(
       key: const ValueKey('content'),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingLarge, vertical: kSpacingXLarge),
       child: Column(
         children: [
           _buildUserInfo(context, photo),
-          const Divider(height: 40, thickness: 1),
+          const Divider(height: kSpacingHuge, thickness: 1),
           _buildAllInfo(context, photo),
-          const Divider(height: 40, thickness: 1),
+          const Divider(height: kSpacingHuge, thickness: 1),
           _buildPhotoStats(context, photo),
-          const SizedBox(height: 24),
+          const SizedBox(height: kSpacingXXLarge),
           _buildTags(context, photo),
-          const SizedBox(height: 32),
+          const SizedBox(height: kSpacingXXLarge),
           _buildWallpaperButton(photo),
         ],
       ),
@@ -140,10 +161,10 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
     return Row(
       children: [
         CircleAvatar(
-          radius: 20,
+          radius: kAvatarRadiusMedium,
           backgroundImage: NetworkImage(photo.user?.profileImage?.medium ?? ""),
         ),
-        SizedBox(width: 12),
+        SizedBox(width: kSpacingMedium),
         Expanded(
           child: Text(
             photo.user?.name ?? "Unknown",
@@ -188,7 +209,7 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
                     align: CrossAxisAlignment.start)),
           ],
         ),
-        SizedBox(height: 16),
+        SizedBox(height: kSpacingLarge),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -202,7 +223,7 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
                     align: CrossAxisAlignment.start)),
           ],
         ),
-        SizedBox(height: 16),
+        SizedBox(height: kSpacingLarge),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -247,15 +268,15 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
         child: Row(
           children: photo.tags!
               .map((tag) => Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Chip(
-                      label: Text(tag.title ?? ""),
-                      backgroundColor: Colors.grey[200],
-                      shape: StadiumBorder(),
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ))
+            padding: const EdgeInsets.only(right: kSpacingSmall),
+            child: Chip(
+              label: Text(tag.title ?? ""),
+              backgroundColor: Colors.grey[200],
+              shape: StadiumBorder(),
+              padding: EdgeInsets.symmetric(horizontal: kSpacingSmall),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ))
               .toList(),
         ),
       ),
@@ -274,7 +295,7 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
               .bodySmall
               ?.copyWith(color: Colors.grey[600]),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: kSpacingExtraSmall),
         Text(
           value,
           style: Theme.of(context)
@@ -295,9 +316,9 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
         label: Text("SET AS WALLPAPER", style: TextStyle(color: Colors.white)),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black,
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: kSpacingXXLarge, vertical: kSpacingMedium),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(kBorderRadiusLarge)),
         ),
       ),
     );

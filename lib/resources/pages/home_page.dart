@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/home_controller.dart';
 import '../../app/models/photo.dart';
+import '../../constants/app_dimensions.dart';
 import '../widgets/animated_circular_notch.dart';
 import '../widgets/photo_list_item.dart';
 import 'collections_page.dart';
-
+import '../../app/controllers/home_state.dart'; // IMPORT STATE MỚI
 
 class HomePage extends NyStatefulWidget<HomeController> {
   static RouteView path = ("/home", (_) => HomePage());
@@ -17,19 +17,18 @@ class HomePage extends NyStatefulWidget<HomeController> {
 }
 
 class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
+  // ... (code initState, dispose, _handleScroll v.v. giữ nguyên) ...
   late TabController _tabController;
   final ScrollController _homeScrollController = ScrollController();
-
   late AnimationController _bottomNavBarAnimationController;
   late Animation<double> _fabAndNotchAnimation;
-
-  final double _bottomNavBarHeight = 70.0;
-  final double _fabDiameter = 60.0;
-  final double _fabMargin = 2.5;
+  final double _bottomNavBarHeight = kBottomNavBarHeight;
+  final double _fabDiameter = kFabDiameter;
+  final double _fabMargin = kFabMargin;
 
   @override
   get init => () async {
-    if (widget.controller.photos.value.isEmpty) {
+    if (widget.controller.homeState.value.photos.isEmpty) {
       await widget.controller.fetchInitialPhotos();
     }
   };
@@ -38,37 +37,31 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
     _bottomNavBarAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
       value: 1.0,
     );
-
     _fabAndNotchAnimation = CurvedAnimation(
       parent: _bottomNavBarAnimationController,
       curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
     );
-
     _homeScrollController.addListener(_handleScroll);
   }
 
   void _handleScroll() {
     final direction = _homeScrollController.position.userScrollDirection;
-
     if (direction == ScrollDirection.reverse) {
       if (_bottomNavBarAnimationController.status != AnimationStatus.reverse &&
           _bottomNavBarAnimationController.status != AnimationStatus.dismissed) {
         _bottomNavBarAnimationController.reverse();
       }
-    }
-    else if (direction == ScrollDirection.forward) {
+    } else if (direction == ScrollDirection.forward) {
       if (_bottomNavBarAnimationController.status != AnimationStatus.forward &&
           _bottomNavBarAnimationController.status != AnimationStatus.completed) {
         _bottomNavBarAnimationController.forward();
       }
     }
-
     if (_homeScrollController.position.pixels >=
         _homeScrollController.position.maxScrollExtent * 0.9) {
       widget.controller.fetchMorePhotos();
@@ -84,8 +77,10 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+
   @override
   Widget view(BuildContext context) {
+    // ... (code tính toán kích thước, Scaffold, AppBar, FAB, BottomNavBar giữ nguyên) ...
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
@@ -100,25 +95,47 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(appBarHeight),
-        child: SafeArea(child: TabBar(controller: _tabController, onTap: (index) { if (index == 0) { widget.controller.scrollToTop(_homeScrollController); } }, labelColor: Colors.black, indicatorColor: Colors.black, indicatorSize: TabBarIndicatorSize.tab, indicatorWeight: 3, labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: screenWidth * 0.04,), unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: screenWidth * 0.04,), tabs: const [Tab(text: "HOME"), Tab(text: "COLLECTIONS"),],),),
+        child: SafeArea(
+          child: TabBar(
+            controller: _tabController,
+            onTap: (index) {
+              if (index == 0) {
+                widget.controller.scrollToTop(_homeScrollController);
+              }
+            },
+            labelColor: Colors.black,
+            indicatorColor: Colors.black,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorWeight: 3,
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: screenWidth * 0.04,
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: screenWidth * 0.04,
+            ),
+            tabs: const [
+              Tab(text: "HOME"),
+              Tab(text: "COLLECTIONS"),
+            ],
+          ),
+        ),
       ),
       body: TabBarView(
-        controller: _tabController, physics: const NeverScrollableScrollPhysics(), children: [ValueListenableBuilder<List<Photo>>(
-        valueListenable: widget.controller.photos,
-        builder: (context, photoList, child) {
-          // Lồng builder thứ 2 để lắng nghe isLoadingMorePhotos
-          return ValueListenableBuilder<bool>(
-            valueListenable: widget.controller.isLoadingMorePhotos,
-            builder: (context, isLoadingMore, child) {
-              // Gọi hàm build body với cả hai giá trị state
-              return _buildHomeTabBody(photoList, isLoadingMore);
+        controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          // ĐÃ SỬA: Chỉ dùng 1 ValueListenableBuilder
+          ValueListenableBuilder<HomeState>(
+            valueListenable: widget.controller.homeState,
+            builder: (context, state, child) {
+              return _buildHomeTabBody(state);
             },
-          );
-        },
+          ),
+          CollectionsPage(),
+        ],
       ),
-        CollectionsPage(),],
-      ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AnimatedBuilder(
         animation: _fabAndNotchAnimation,
@@ -140,12 +157,12 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
-
       bottomNavigationBar: AnimatedBuilder(
         animation: _bottomNavBarAnimationController,
         builder: (context, child) {
           return Transform.translate(
-            offset: Offset(0, (1 - _bottomNavBarAnimationController.value) * _bottomNavBarHeight),
+            offset: Offset(
+                0, (1 - _bottomNavBarAnimationController.value) * _bottomNavBarHeight),
             child: BottomAppBar(
               height: _bottomNavBarHeight,
               color: Colors.white,
@@ -158,10 +175,19 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  IconButton(icon: const Icon(Icons.menu), color: Colors.grey.shade700, onPressed: () => _onIconTapped(0)),
+                  IconButton(
+                      icon: const Icon(Icons.menu),
+                      color: Colors.grey.shade700,
+                      onPressed: () => _onIconTapped(0)),
                   const Spacer(),
-                  IconButton(icon: const Icon(Icons.search), color: Colors.grey.shade700, onPressed: () => _onIconTapped(1)),
-                  IconButton(icon: const Icon(Icons.sort), color: Colors.grey.shade700, onPressed: () => _onIconTapped(2)),
+                  IconButton(
+                      icon: const Icon(Icons.search),
+                      color: Colors.grey.shade700,
+                      onPressed: () => _onIconTapped(1)),
+                  IconButton(
+                      icon: const Icon(Icons.sort),
+                      color: Colors.grey.shade700,
+                      onPressed: () => _onIconTapped(2)),
                 ],
               ),
             ),
@@ -172,28 +198,71 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
   }
 
   void _onIconTapped(int index) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar(); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tapped on icon index $index'), duration: const Duration(seconds: 1), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),),);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Tapped on icon index $index'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+    );
   }
-  Widget _buildHomeTabBody(List<Photo> photoList, bool isLoadingMore) {
-    final listVerticalPadding = MediaQuery.of(context).size.height * 0.02;
-    final listBottomPadding = _bottomNavBarHeight + 20;
 
-    if (photoList.isEmpty && !isLoadingMore) {
-      return Center(child: LoadingAnimationWidget.fourRotatingDots(color: Colors.grey.shade400, size: 50,),);
+  // ĐÃ SỬA: Hàm này nhận vào HomeState
+  Widget _buildHomeTabBody(HomeState state) {
+    final listVerticalPadding = kSpacingLarge;
+    final listBottomPadding = _bottomNavBarHeight + kSpacingXLarge;
+
+    // Hiển thị lỗi
+    if (state.errorMessage != null && !state.isRefreshing) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            state.errorMessage!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.only(bottom: listBottomPadding, top: listVerticalPadding),
+    // Hiển thị loading ban đầu
+    if (state.photos.isEmpty && !state.isLoadingMore && state.errorMessage == null) {
+      return Center(
+        child: LoadingAnimationWidget.fourRotatingDots(
+          color: Colors.grey.shade400,
+          size: 50,
+        ),
+      );
+    }
+
+    // Hiển thị danh sách (có thể đang refresh)
+    Widget listView = ListView.builder(
+      padding:
+      EdgeInsets.only(bottom: listBottomPadding, top: listVerticalPadding),
       controller: _homeScrollController,
-      // ĐÃ SỬA: Dùng biến `isLoadingMore` từ builder
-      itemCount: photoList.length + (isLoadingMore ? 1 : 0),
+      itemCount: state.photos.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index >= photoList.length) {
-          return const Padding(padding: EdgeInsets.all(16.0), child: Center(child: CircularProgressIndicator(color: Colors.black)),);
+        if (index >= state.photos.length) {
+          return const Padding(
+            padding: EdgeInsets.all(kSpacingLarge),
+            child: Center(child: CircularProgressIndicator(color: Colors.black)),
+          );
         }
-        final photo = photoList[index];
+        final photo = state.photos[index];
         return PhotoListItem(photo: photo);
       },
+    );
+
+    // Bọc danh sách bằng RefreshIndicator
+    return RefreshIndicator(
+      onRefresh: widget.controller.onRefresh,
+      child: listView,
     );
   }
 }

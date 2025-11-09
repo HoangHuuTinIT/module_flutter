@@ -1,65 +1,67 @@
-// lib/app/controllers/home_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/photo.dart';
 import '../models/photo_response.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
+import 'home_state.dart'; // IMPORT STATE MỚI
 
 class HomeController extends Controller {
   HomeController();
 
-  final ValueNotifier<List<Photo>> photos = ValueNotifier([]);
+  // ĐÃ SỬA: Dùng một State Object duy nhất
+  final ValueNotifier<HomeState> homeState = ValueNotifier(HomeState());
+
   String? _nextPageUrl;
 
-  // ĐÃ SỬA: Biến `isLoadingMorePhotos` thành một ValueNotifier
-  final ValueNotifier<bool> isLoadingMorePhotos = ValueNotifier(false);
-
-  final ValueNotifier<bool> isRefreshing = ValueNotifier(false);
-
   Future<void> fetchInitialPhotos() async {
-    // Reset trạng thái loading khi tải lại từ đầu
-    isLoadingMorePhotos.value = false;
+    // Reset state về refreshing
+    homeState.value = homeState.value.copyWith(isRefreshing: true, errorMessage: null);
 
-    PhotoResponse? response =
-    await api<ApiService>((request) => request.fetchPhotos());
-    if (response != null) {
-      photos.value = response.photos;
-      _nextPageUrl = response.nextPageUrl;
+    try {
+      PhotoResponse? response =
+      await api<ApiService>((request) => request.fetchPhotos());
+      if (response != null) {
+        _nextPageUrl = response.nextPageUrl;
+        homeState.value = homeState.value.copyWith(
+          photos: response.photos,
+          isRefreshing: false,
+        );
+      }
+    } catch (e) {
+      homeState.value = homeState.value.copyWith(
+        isRefreshing: false,
+        errorMessage: "Không thể tải dữ liệu. Vui lòng thử lại.",
+      );
     }
   }
 
   Future<void> fetchMorePhotos() async {
-    // ĐÃ SỬA: Dùng .value
-    if (isLoadingMorePhotos.value || _nextPageUrl == null) return;
+    if (homeState.value.isLoadingMore || _nextPageUrl == null) return;
 
-    // ĐÃ SỬA: Dùng .value
-    isLoadingMorePhotos.value = true;
+    homeState.value = homeState.value.copyWith(isLoadingMore: true);
 
-    // ĐÃ XÓA: photos.notifyListeners(); (Không cần nữa)
+    try {
+      PhotoResponse? response = await api<ApiService>(
+              (request) => request.fetchPhotos(url: _nextPageUrl));
 
-    PhotoResponse? response =
-    await api<ApiService>((request) => request.fetchPhotos(url: _nextPageUrl));
-
-    if (response != null) {
-      photos.value = List.from(photos.value)..addAll(response.photos);
-      _nextPageUrl = response.nextPageUrl;
+      if (response != null) {
+        _nextPageUrl = response.nextPageUrl;
+        homeState.value = homeState.value.copyWith(
+          photos: List.from(homeState.value.photos)..addAll(response.photos),
+          isLoadingMore: false,
+        );
+      }
+    } catch (e) {
+      // Có thể hiển thị lỗi tinh tế hơn (ví dụ: SnackBar) thay vì ghi đè errorMessage
+      homeState.value = homeState.value.copyWith(isLoadingMore: false);
     }
-
-    // ĐÃ SỬA: Dùng .value
-    isLoadingMorePhotos.value = false;
   }
 
-  // ... (các hàm còn lại giữ nguyên) ...
   Future<void> onRefresh() async {
-    if (isRefreshing.value) return;
-    isRefreshing.value = true;
+    if (homeState.value.isRefreshing) return;
     await fetchInitialPhotos();
-    await Future.delayed(const Duration(seconds: 1));
-    isRefreshing.value = false;
   }
-
 
   void scrollToTop(ScrollController scrollController) {
     if (scrollController.hasClients) {

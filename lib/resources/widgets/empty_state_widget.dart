@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../constants/app_dimensions.dart';
+
 class EmptyStateWidget extends StatelessWidget {
   final String message;
   const EmptyStateWidget({Key? key, this.message = "Nothing to see here..."})
@@ -20,7 +22,7 @@ class EmptyStateWidget extends StatelessWidget {
             width: 150,
             height: 150,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: kSpacingXXLarge),
           // Hiển thị thông báo
           Text(
             message,

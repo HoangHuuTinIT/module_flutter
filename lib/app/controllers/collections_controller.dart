@@ -1,64 +1,79 @@
+// lib/app/controllers/collections_controller.dart
+
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/collection.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
+import 'collections_state.dart'; // IMPORT STATE MỚI
 
 class CollectionsController extends Controller {
   CollectionsController();
 
-  final ValueNotifier<List<Collection>> allCollections = ValueNotifier([]);
+  // ĐÃ SỬA: Dùng một State Object duy nhất
+  final ValueNotifier<CollectionsState> collectionsState =
+  ValueNotifier(CollectionsState());
+
   int _allCollectionsPage = 1;
-
-  // ĐÃ SỬA: Biến `isLoadingMoreCollections` thành một ValueNotifier
-  final ValueNotifier<bool> isLoadingMoreCollections = ValueNotifier(false);
-
   bool _hasMoreCollections = true;
 
   Future<void> fetchInitialCollections() async {
-    allCollections.value = [];
+    // Set state về loading ban đầu
+    collectionsState.value = collectionsState.value.copyWith(isLoading: true, errorMessage: null);
     _allCollectionsPage = 1;
     _hasMoreCollections = true;
 
-    // ĐÃ SỬA: Dùng .value
-    isLoadingMoreCollections.value = false;
+    try {
+      List<Collection>? initialCollections = await api<ApiService>(
+              (request) => request.fetchAllCollections(page: _allCollectionsPage));
 
-    List<Collection>? initialCollections = await api<ApiService>(
-            (request) => request.fetchAllCollections(page: _allCollectionsPage));
-
-    if (initialCollections != null) {
-      allCollections.value = initialCollections;
-      if (initialCollections.length < 20) {
-        _hasMoreCollections = false;
+      if (initialCollections != null) {
+        if (initialCollections.length < 20) {
+          _hasMoreCollections = false;
+        }
+        collectionsState.value = collectionsState.value.copyWith(
+          collections: initialCollections,
+          isLoading: false,
+        );
       }
+    } catch (e) {
+      collectionsState.value = collectionsState.value.copyWith(
+        isLoading: false,
+        errorMessage: "Không thể tải collections.",
+      );
     }
   }
 
   Future<void> fetchMoreCollections() async {
-    // ĐÃ SỬA: Dùng .value
-    if (isLoadingMoreCollections.value || !_hasMoreCollections) return;
+    if (collectionsState.value.isLoadingMore || !_hasMoreCollections) return;
 
-    // ĐÃ SỬA: Dùng .value
-    isLoadingMoreCollections.value = true;
-
-    // ĐÃ XÓA: allCollections.notifyListeners(); // Không cần thiết nữa
-
+    collectionsState.value =
+        collectionsState.value.copyWith(isLoadingMore: true);
     _allCollectionsPage++;
 
-    List<Collection>? newCollections = await api<ApiService>(
-            (request) => request.fetchAllCollections(page: _allCollectionsPage));
+    try {
+      List<Collection>? newCollections = await api<ApiService>(
+              (request) => request.fetchAllCollections(page: _allCollectionsPage));
 
-    if (newCollections != null) {
-      if (newCollections.isEmpty || newCollections.length < 20) {
+      if (newCollections != null) {
+        if (newCollections.isEmpty || newCollections.length < 20) {
+          _hasMoreCollections = false;
+        }
+        collectionsState.value = collectionsState.value.copyWith(
+          collections: List.from(collectionsState.value.collections)
+            ..addAll(newCollections),
+          isLoadingMore: false,
+        );
+      } else {
         _hasMoreCollections = false;
+        collectionsState.value =
+            collectionsState.value.copyWith(isLoadingMore: false);
       }
-      allCollections.value = List.from(allCollections.value)..addAll(newCollections);
-    } else {
-      _hasMoreCollections = false;
+    } catch (e) {
+      _hasMoreCollections = false; // Dừng việc tải thêm nếu có lỗi
+      collectionsState.value =
+          collectionsState.value.copyWith(isLoadingMore: false);
     }
-
-    // ĐÃ SỬA: Dùng .value
-    isLoadingMoreCollections.value = false;
   }
 
   void handleCollectionsScroll(ScrollController scrollController) {

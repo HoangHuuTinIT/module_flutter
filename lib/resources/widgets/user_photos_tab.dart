@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/controllers/user_profile_controller.dart';
-// IMPORT STATE MỚI
 import '../../app/controllers/user_profile_state.dart';
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/photo.dart';
+// IMPORT MỚI
+import '../../resources/pages/photo_detail_page.dart';
+
 
 class UserPhotosTab extends StatefulWidget {
   final UserProfileController controller;
@@ -17,7 +19,6 @@ class UserPhotosTab extends StatefulWidget {
 }
 
 class _UserPhotosTabState extends State<UserPhotosTab> {
-  // ... (initState, dispose, _onScroll giữ nguyên) ...
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -43,12 +44,9 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
 
   @override
   Widget build(BuildContext context) {
-    // ĐÃ SỬA: Lắng nghe controller.state
     return ValueListenableBuilder<UserProfileState>(
-      // ĐÃ SỬA: Đổi tên thành 'userProfileState'
       valueListenable: widget.controller.userProfileState,
       builder: (context, state, _) {
-        // ĐÃ SỬA: Lấy photos và isLoadingMore từ state
         final photos = state.userPhotos;
         final isLoadingMore = state.isLoadingMoreUserPhotos;
 
@@ -61,7 +59,6 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
         return ListView.builder(
           controller: _scrollController,
           padding: EdgeInsets.symmetric(vertical: 8),
-          // ĐÃ SỬA: Dùng biến isLoadingMore
           itemCount: photos.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index >= photos.length) {
@@ -71,7 +68,6 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
               );
             }
 
-            // ... (code còn lại giữ nguyên) ...
             final photo = photos[index];
             final double aspectRatio = (photo.width != null &&
                 photo.height != null &&
@@ -81,7 +77,8 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
 
             // BỌC PADDING BẰNG GESTUREDETECTOR
             return GestureDetector(
-              onTap: () => routeTo('/photo-detail', data: photo),
+              // ĐÃ SỬA: Dùng PhotoDetailPage.path thay vì string
+              onTap: () => routeTo(PhotoDetailPage.path, data: photo),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                 child: ClipRRect(

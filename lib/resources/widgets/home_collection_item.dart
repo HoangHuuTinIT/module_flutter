@@ -1,9 +1,14 @@
+// lib/resources/widgets/home_collection_item.dart
 
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 import '../../app/helpers/ui_helpers.dart';
-import '../../app/models/collection.dart'; // THÊM IMPORT NÀY
+import '../../app/models/collection.dart';
+// IMPORT MỚI
+import '../../constants/app_dimensions.dart';
+import '../../resources/pages/collection_detail_page.dart';
+import '../../resources/pages/user_profile_page.dart';
 
 class HomeCollectionItem extends StatelessWidget {
   final Collection collection;
@@ -14,9 +19,10 @@ class HomeCollectionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => routeTo('/collection-detail', data: collection),
+      // ĐÃ SỬA: Dùng CollectionDetailPage.path thay vì string
+      onTap: () => routeTo(CollectionDetailPage.path, data: collection),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 24.0),
+        padding: const EdgeInsets.only(bottom: kSpacingXXLarge),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -25,7 +31,8 @@ class HomeCollectionItem extends StatelessWidget {
               onTap: () {
                 // Kiểm tra nếu có username thì mới điều hướng
                 if (collection.user?.username != null) {
-                  routeTo('/user-profile', data: collection.user!.username);
+                  // ĐÃ SỬA: Dùng UserProfilePage.path thay vì string
+                  routeTo(UserProfilePage.path, data: collection.user!.username);
                 }
               },
               // Đặt màu transparent để GestureDetector bắt sự kiện trên cả vùng trống
@@ -34,11 +41,11 @@ class HomeCollectionItem extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 18,
+                      radius: kAvatarRadiusSmall,
                       backgroundImage: NetworkImage(
                           collection.user?.profileImage?.medium ?? ""),
                     ),
-                    SizedBox(width: 12),
+                    SizedBox(width: kSpacingMedium),
                     Text(
                       collection.user?.name ?? "Unknown User",
                       style: TextStyle(
@@ -50,12 +57,12 @@ class HomeCollectionItem extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: kSpacingMedium),
             // Phần ảnh và thông tin collection (giữ nguyên)
             AspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(kBorderRadiusMedium),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -77,9 +84,9 @@ class HomeCollectionItem extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      bottom: 16,
-                      left: 16,
-                      right: 16,
+                      bottom: kSpacingLarge,
+                      left: kSpacingLarge,
+                      right: kSpacingLarge,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -93,7 +100,7 @@ class HomeCollectionItem extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: kSpacingExtraSmall),
                           Text(
                             "${collection.totalPhotos} Photos",
                             style: TextStyle(

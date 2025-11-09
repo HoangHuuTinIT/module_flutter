@@ -1,38 +1,45 @@
+// lib/app/controllers/photo_detail_page_controller.dart
+
 import 'package:flutter/foundation.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/photo.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
+import 'photo_detail_state.dart'; // IMPORT STATE MỚI
 
 class PhotoDetailPageController extends Controller {
-    final ValueNotifier<Photo?> photoNotifier = ValueNotifier(null);
-    final ValueNotifier<bool> hasLoadedDetails = ValueNotifier(false);
-    Photo? get photo => photoNotifier.value;
-    set photo(Photo? newPhoto) {
-      photoNotifier.value = newPhoto;
-    }
 
-    void setupInitial(dynamic data) {
-      if (data is Photo) {
-        if (photo == null) {
-          photo = data;
-        }
+  // ĐÃ SỬA: Dùng một State Object duy nhất
+  final ValueNotifier<PhotoDetailState> photoState =
+  ValueNotifier(PhotoDetailState());
+
+  void setupInitial(dynamic data) {
+    if (data is Photo) {
+      // Set ảnh ban đầu (chưa có EXIF)
+      photoState.value = photoState.value.copyWith(photo: data);
+    }
+  }
+
+  Future<void> fetchFullDetails() async {
+    final currentPhoto = photoState.value.photo;
+    if (currentPhoto?.exif != null) return;
+    if (currentPhoto == null || currentPhoto.id == null) return;
+
+    try {
+      Photo? fullDetailsPhoto = await api<ApiService>(
+              (request) => request.fetchPhotoDetails(currentPhoto.id!));
+
+      if (fullDetailsPhoto != null) {
+        photoState.value = photoState.value.copyWith(
+          photo: fullDetailsPhoto,
+          hasLoadedDetails: true,
+        );
       }
+    } catch(e) {
+      photoState.value = photoState.value.copyWith(
+          hasLoadedDetails: true, // Vẫn set là true để dừng skeleton
+          errorMessage: "Không thể tải chi tiết ảnh."
+      );
     }
-
-    Future<void> fetchFullDetails() async {
-      if (photo?.exif != null) return;
-
-      if (photo == null || photo!.id == null) return;
-
-      try {
-        Photo? fullDetailsPhoto = await api<ApiService>((request) => request.fetchPhotoDetails(photo!.id!));
-        if (fullDetailsPhoto != null) {
-          photo = fullDetailsPhoto;
-        }
-      } finally {
-        hasLoadedDetails.value = true;
-      }
-    }
-
-} 
+  }
+}

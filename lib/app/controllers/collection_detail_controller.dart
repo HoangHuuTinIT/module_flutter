@@ -1,3 +1,4 @@
+// lib/app/controllers/collection_detail_controller.dart
 
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -5,16 +6,17 @@ import '../models/collection.dart';
 import '../models/photo.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
+import 'collection_detail_state.dart'; // IMPORT STATE MỚI
 
 class CollectionDetailController extends Controller {
   Collection? initialCollection;
-  final ValueNotifier<Collection?> detailedCollection = ValueNotifier(null);
-  final ValueNotifier<List<Photo>> photos = ValueNotifier([]);
-  final ValueNotifier<bool> isLoading = ValueNotifier(true);
+
+  // ĐÃ SỬA: Dùng một State Object duy nhất
+  final ValueNotifier<CollectionDetailState> detailState =
+  ValueNotifier(CollectionDetailState());
 
   int _page = 1;
   bool _hasMore = true;
-  bool isLoadingMore = false;
 
   void setupInitial(Collection collection) {
     initialCollection = collection;
@@ -22,44 +24,67 @@ class CollectionDetailController extends Controller {
 
   Future<void> fetchAllDetails() async {
     if (initialCollection?.id == null) return;
-    isLoading.value = true;
+
+    detailState.value = detailState.value.copyWith(isLoading: true, errorMessage: null);
     _page = 1;
     _hasMore = true;
-    final results = await Future.wait([
-      api<ApiService>((request) => request.fetchCollectionDetails(initialCollection!.id!)),
-      api<ApiService>((request) => request.fetchPhotosForCollection(initialCollection!.id!, page: _page)),
-    ]);
 
-    detailedCollection.value = results[0] as Collection?;
-    final initialPhotos = results[1] as List<Photo>? ?? [];
+    try {
+      final results = await Future.wait([
+        api<ApiService>((request) =>
+            request.fetchCollectionDetails(initialCollection!.id!)),
+        api<ApiService>((request) =>
+            request.fetchPhotosForCollection(initialCollection!.id!, page: _page)),
+      ]);
 
-    photos.value = initialPhotos;
-    if (initialPhotos.length < 20) {
-      _hasMore = false;
+      final collectionDetails = results[0] as Collection?;
+      final initialPhotos = results[1] as List<Photo>? ?? [];
+
+      if (initialPhotos.length < 20) {
+        _hasMore = false;
+      }
+
+      detailState.value = detailState.value.copyWith(
+        detailedCollection: collectionDetails,
+        photos: initialPhotos,
+        isLoading: false,
+      );
+    } catch (e) {
+      detailState.value = detailState.value.copyWith(
+          isLoading: false,
+          errorMessage: "Không thể tải chi tiết collection."
+      );
     }
-
-    isLoading.value = false;
   }
 
   Future<void> fetchMoreCollectionPhotos() async {
-    if (isLoadingMore || !_hasMore || initialCollection?.id == null) return;
+    if (detailState.value.isLoadingMore ||
+        !_hasMore ||
+        initialCollection?.id == null) return;
 
-    isLoadingMore = true;
-    photos.notifyListeners();
-
+    detailState.value = detailState.value.copyWith(isLoadingMore: true);
     _page++;
-    List<Photo>? newPhotos = await api<ApiService>((request) =>
-        request.fetchPhotosForCollection(initialCollection!.id!, page: _page));
 
-    if (newPhotos != null) {
-      if (newPhotos.isEmpty || newPhotos.length < 20) {
+    try {
+      List<Photo>? newPhotos = await api<ApiService>((request) =>
+          request.fetchPhotosForCollection(initialCollection!.id!, page: _page));
+
+      if (newPhotos != null) {
+        if (newPhotos.isEmpty || newPhotos.length < 20) {
+          _hasMore = false;
+        }
+        detailState.value = detailState.value.copyWith(
+          photos: List.from(detailState.value.photos)..addAll(newPhotos),
+          isLoadingMore: false,
+        );
+      } else {
         _hasMore = false;
+        detailState.value = detailState.value.copyWith(isLoadingMore: false);
       }
-      photos.value = List.from(photos.value)..addAll(newPhotos);
-    } else {
+    } catch(e) {
       _hasMore = false;
+      detailState.value = detailState.value.copyWith(isLoadingMore: false);
     }
-    isLoadingMore = false;
   }
 
   void handleScroll(ScrollController scrollController) {

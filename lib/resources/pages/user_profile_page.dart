@@ -6,6 +6,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/user_profile_controller.dart';
 import '../../app/models/user_detail.dart';
 import '../../app/controllers/user_profile_state.dart';
+import '../../constants/app_dimensions.dart';
 import '../widgets/user_collections_tab.dart';
 import '../widgets/user_likes_tab.dart';
 import '../widgets/user_photos_tab.dart';
@@ -44,7 +45,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
           if (state.errorMessage != null && !state.isUserLoading) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(kSpacingLarge),
                 // Bạn có thể dùng EmptyStateWidget hoặc 1 Text đơn giản
                 child: Text(
                   state.errorMessage!,
@@ -60,7 +61,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
             return Center(
               child: LoadingAnimationWidget.fourRotatingDots(
                 color: Colors.grey.shade400,
-                size: 50,
+                size: kLoaderSize,
               ),
             );
           }
@@ -129,7 +130,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
               return Center(
                 child: LoadingAnimationWidget.staggeredDotsWave(
                   color: Colors.grey.shade400,
-                  size: 50,
+                  size: kLoaderSize,
                 ),
               );
             }
@@ -155,17 +156,17 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
   // ... (Các hàm _buildHeader, _buildStatColumn, _formatNumber, _SliverAppBarDelegate giữ nguyên) ...
   Widget _buildHeader(BuildContext context, UserDetail user) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: kSpacingLarge, vertical: kSpacingSmall),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               CircleAvatar(
-                radius: 40,
+                radius: kAvatarRadiusLarge,
                 backgroundImage: NetworkImage(user.profileImage?.large ?? ""),
               ),
-              SizedBox(width: 20),
+              SizedBox(width: kSpacingXLarge),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -178,20 +179,20 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
               ),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: kSpacingMedium),
           Text(
             user.name ?? "",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           if (user.location != null && user.location!.isNotEmpty) ...[
-            SizedBox(height: 4),
+            SizedBox(height: kSpacingExtraSmall),
             Text(
               user.location!,
               style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ],
           if (user.bio != null && user.bio!.isNotEmpty) ...[
-            SizedBox(height: 8),
+            SizedBox(height: kSpacingSmall),
             Text(
               user.bio!,
               style: TextStyle(fontSize: 14),
@@ -213,7 +214,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
           _formatNumber(count),
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: kSpacingExtraSmall),
         Text(
           label,
           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
