@@ -1,7 +1,4 @@
-// lib/resources/widgets/empty_state_widget.dart
-
 import 'package:flutter/material.dart';
-
 import '../../app/constants/app_dimensions.dart';
 
 class EmptyStateWidget extends StatelessWidget {
@@ -16,14 +13,12 @@ class EmptyStateWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Hiển thị ảnh từ assets
           Image.asset(
-            'public/images/empty_state.png', // Đường dẫn trong pubspec.yaml
+            'public/images/empty_state.png',
             width: 150,
             height: 150,
           ),
           const SizedBox(height: kSpacingXXLarge),
-          // Hiển thị thông báo
           Text(
             message,
             textAlign: TextAlign.center,

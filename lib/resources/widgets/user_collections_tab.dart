@@ -1,11 +1,6 @@
-// lib/resources/widgets/user_collections_tab.dart
-
 import 'package:flutter/material.dart';
-
 import '../../app/controllers/user_profile_controller.dart';
-// IMPORT STATE MỚI
 import '../../app/states/user_profile_state.dart';
-import '../../app/models/collection.dart';
 import 'collection_list_item.dart';
 
 class UserCollectionsTab extends StatefulWidget {
@@ -41,25 +36,20 @@ class _UserCollectionsTabState extends State<UserCollectionsTab> {
 
   @override
   Widget build(BuildContext context) {
-    // ĐÃ SỬA: Lắng nghe controller.state
     return ValueListenableBuilder<UserProfileState>(
-      // ĐÃ SỬA: Đổi tên thành 'userProfileState'
       valueListenable: widget.controller.userProfileState,
       builder: (context, state, _) {
-        // ĐÃ SỬA: Lấy 'collections' và 'isLoadingMore' từ state
         final collections = state.collections;
         final isLoadingMore = state.isLoadingMoreCollections;
 
-        if (collections.isEmpty && !isLoadingMore) { // Thêm check !isLoadingMore
+        if (collections.isEmpty && !isLoadingMore) {
           return Center(
               child: Text("No collections found.",
                   style: TextStyle(color: Colors.grey)));
         }
-
         return ListView.builder(
           controller: _scrollController,
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          // ĐÃ SỬA: Dùng biến isLoadingMore
           itemCount: collections.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index >= collections.length) {

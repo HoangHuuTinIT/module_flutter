@@ -1,12 +1,7 @@
-// lib/resources/widgets/user_likes_tab.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_module_4/resources/widgets/photo_list_item.dart';
-
 import '../../app/controllers/user_profile_controller.dart';
-// IMPORT STATE MỚI
 import '../../app/states/user_profile_state.dart';
-import '../../app/models/photo.dart';
 
 class UserLikesTab extends StatefulWidget {
   final UserProfileController controller;
@@ -41,24 +36,18 @@ class _UserLikesTabState extends State<UserLikesTab> {
 
   @override
   Widget build(BuildContext context) {
-    // ĐÃ SỬA: Lắng nghe controller.state
     return ValueListenableBuilder<UserProfileState>(
-      // ĐÃ SỬA: Đổi tên thành 'userProfileState'
         valueListenable: widget.controller.userProfileState,
         builder: (context, state, _) {
-          // ĐÃ SỬA: Lấy 'photos' và 'isLoadingMore' từ state
           final photos = state.likedPhotos;
           final isLoadingMore = state.isLoadingMoreLikedPhotos;
-
-          if (photos.isEmpty && !isLoadingMore) { // Thêm check !isLoadingMore
+          if (photos.isEmpty && !isLoadingMore) {
             return Center(
                 child: Text("No liked photos found.",
                     style: TextStyle(color: Colors.grey)));
           }
-
           return ListView.builder(
             controller: _scrollController,
-            // ĐÃ SỬA: Dùng biến isLoadingMore
             itemCount: photos.length + (isLoadingMore ? 1 : 0),
             itemBuilder: (context, index) {
               if (index >= photos.length) {

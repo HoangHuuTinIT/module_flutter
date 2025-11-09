@@ -1,8 +1,5 @@
-// lib/app/controllers/home_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-import '../models/photo.dart';
 import '../models/photo_response.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
@@ -52,26 +49,23 @@ class HomeController extends Controller {
           isLoadingMore: false,
         );
       } else {
-        // Nếu response là null (ít xảy ra vì ApiService ném lỗi)
         _nextPageUrl = null;
         homeState.value = homeState.value.copyWith(isLoadingMore: false);
       }
     } catch (e) {
-      // ĐÃ SỬA: Xử lý lỗi khi tải thêm
-      _nextPageUrl = null; // Dừng tải thêm
+      _nextPageUrl = null;
       homeState.value = homeState.value.copyWith(isLoadingMore: false);
-      // CÁCH SỬA ĐÚNG:
-      showToastNotification(
-        // Tạo một đối tượng ToastMeta kiểu danger
-        ToastMeta.danger(
+      if (context != null) {
+        showToastNotification(
+          context!,
+          style: ToastNotificationStyleType.danger,
           title: "Lỗi",
-          description: "Không thể tải thêm.",
-        ) as BuildContext,
-      );
+          description: "Không thể tải thêm. Vui lòng thử lại sau.",
+        );
+      }
     }
   }
 
-  // ... (các hàm onRefresh, scrollToTop giữ nguyên) ...
   Future<void> onRefresh() async {
     if (homeState.value.isRefreshing) return;
     await fetchInitialPhotos();

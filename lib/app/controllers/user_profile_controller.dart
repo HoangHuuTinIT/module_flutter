@@ -1,5 +1,3 @@
-// lib/app/controllers/user_profile_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/collection.dart';
@@ -32,7 +30,6 @@ class UserProfileController extends Controller {
     userProfileState.value = userProfileState.value.reset();
   }
 
-  // ... (fetchUserDetails và fetchTabsData giữ nguyên với try-catch) ...
   Future<void> fetchUserDetails(String username) async {
     resetState();
 
@@ -96,7 +93,7 @@ class UserProfileController extends Controller {
     userProfileState.value = userProfileState.value.copyWith(isLoadingMoreUserPhotos: true);
     _userPhotosPage++;
 
-    try { // ĐÃ THÊM try-catch
+    try {
       List<Photo>? newPhotos = await api<ApiService>((request) =>
           request.fetchUserPhotos(userProfileState.value.userDetail!.username!, page: _userPhotosPage));
 
@@ -110,17 +107,17 @@ class UserProfileController extends Controller {
         _hasMoreUserPhotos = false;
         userProfileState.value = userProfileState.value.copyWith(isLoadingMoreUserPhotos: false);
       }
-    } catch(e) { // ĐÃ THÊM catch
+    } catch(e) {
       _hasMoreUserPhotos = false;
       userProfileState.value = userProfileState.value.copyWith(isLoadingMoreUserPhotos: false);
-      // CÁCH SỬA ĐÚNG:
-      showToastNotification(
-        // Tạo một đối tượng ToastMeta kiểu danger
-        ToastMeta.danger(
+      if (context != null) {
+        showToastNotification(
+          context!,
+          style: ToastNotificationStyleType.danger,
           title: "Lỗi",
-          description: "Không thể tải thêm.",
-        ) as BuildContext,
-      );
+          description: "Không thể tải thêm. Vui lòng thử lại sau.",
+        );
+      }
     }
   }
 
@@ -130,7 +127,7 @@ class UserProfileController extends Controller {
     userProfileState.value = userProfileState.value.copyWith(isLoadingMoreLikedPhotos: true);
     _likedPhotosPage++;
 
-    try { // ĐÃ THÊM try-catch
+    try {
       List<Photo>? newPhotos = await api<ApiService>((request) =>
           request.fetchUserLikes(userProfileState.value.userDetail!.username!, page: _likedPhotosPage));
 
@@ -144,17 +141,17 @@ class UserProfileController extends Controller {
         _hasMoreLikedPhotos = false;
         userProfileState.value = userProfileState.value.copyWith(isLoadingMoreLikedPhotos: false);
       }
-    } catch(e) { // ĐÃ THÊM catch
+    } catch(e) {
       _hasMoreLikedPhotos = false;
       userProfileState.value = userProfileState.value.copyWith(isLoadingMoreLikedPhotos: false);
-      // CÁCH SỬA ĐÚNG:
-      showToastNotification(
-        // Tạo một đối tượng ToastMeta kiểu danger
-        ToastMeta.danger(
+      if (context != null) {
+        showToastNotification(
+          context!,
+          style: ToastNotificationStyleType.danger,
           title: "Lỗi",
-          description: "Không thể tải thêm.",
-        ) as BuildContext,
-      );
+          description: "Không thể tải thêm. Vui lòng thử lại sau.",
+        );
+      }
     }
   }
 
@@ -164,7 +161,7 @@ class UserProfileController extends Controller {
     userProfileState.value = userProfileState.value.copyWith(isLoadingMoreCollections: true);
     _collectionsPage++;
 
-    try { // ĐÃ THÊM try-catch
+    try {
       List<Collection>? newCollections = await api<ApiService>((request) =>
           request.fetchUserCollections(userProfileState.value.userDetail!.username!, page: _collectionsPage));
 
@@ -178,17 +175,17 @@ class UserProfileController extends Controller {
         _hasMoreCollections = false;
         userProfileState.value = userProfileState.value.copyWith(isLoadingMoreCollections: false);
       }
-    } catch(e) { // ĐÃ THÊM catch
+    } catch(e) {
       _hasMoreCollections = false;
       userProfileState.value = userProfileState.value.copyWith(isLoadingMoreCollections: false);
-      // CÁCH SỬA ĐÚNG:
-      showToastNotification(
-        // Tạo một đối tượng ToastMeta kiểu danger
-        ToastMeta.danger(
+      if (context != null) {
+        showToastNotification(
+          context!,
+          style: ToastNotificationStyleType.danger,
           title: "Lỗi",
-          description: "Không thể tải thêm.",
-        ) as BuildContext,
-      );
+          description: "Không thể tải thêm. Vui lòng thử lại sau.",
+        );
+      }
     }
   }
 }

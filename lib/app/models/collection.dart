@@ -1,4 +1,3 @@
-
 import 'package:flutter_module_4/app/models/photo.dart';
 import 'package:flutter_module_4/app/models/user.dart';
 import 'package:nylo_framework/nylo_framework.dart';

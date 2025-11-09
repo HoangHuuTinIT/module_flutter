@@ -1,11 +1,7 @@
-// lib/resources/widgets/home_collection_item.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/collection.dart';
-// IMPORT MỚI
 import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/collection_detail_page.dart';
 import '../../resources/pages/user_profile_page.dart';
@@ -19,23 +15,18 @@ class HomeCollectionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // ĐÃ SỬA: Dùng CollectionDetailPage.path thay vì string
       onTap: () => routeTo(CollectionDetailPage.path, data: collection),
       child: Padding(
         padding: const EdgeInsets.only(bottom: kSpacingXXLarge),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // THÊM GestureDetector ĐỂ BẮT SỰ KIỆN NHẤN
             GestureDetector(
               onTap: () {
-                // Kiểm tra nếu có username thì mới điều hướng
                 if (collection.user?.username != null) {
-                  // ĐÃ SỬA: Dùng UserProfilePage.path thay vì string
                   routeTo(UserProfilePage.path, data: collection.user!.username);
                 }
               },
-              // Đặt màu transparent để GestureDetector bắt sự kiện trên cả vùng trống
               child: Container(
                 color: Colors.transparent,
                 child: Row(
@@ -58,7 +49,6 @@ class HomeCollectionItem extends StatelessWidget {
               ),
             ),
             SizedBox(height: kSpacingMedium),
-            // Phần ảnh và thông tin collection (giữ nguyên)
             AspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRRect(

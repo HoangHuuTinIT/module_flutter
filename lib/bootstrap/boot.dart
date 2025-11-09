@@ -38,7 +38,6 @@ class Boot {
 |-------------------------------------------------------------------------- */
 
 _setup() async {
-  await dotenv.load(fileName:'env');
   /// Example: Initializing StorageConfig
   // StorageConfig.init(
   //   androidOptions: AndroidOptions(

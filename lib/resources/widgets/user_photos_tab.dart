@@ -1,12 +1,8 @@
-// lib/resources/widgets/user_photos_tab.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/controllers/user_profile_controller.dart';
 import '../../app/states/user_profile_state.dart';
 import '../../app/helpers/ui_helpers.dart';
-import '../../app/models/photo.dart';
-// IMPORT MỚI
 import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/photo_detail_page.dart';
 
@@ -70,10 +66,7 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
             }
 
             final photo = photos[index];
-
-            // BỌC PADDING BẰNG GESTUREDETECTOR
             return GestureDetector(
-              // ĐÃ SỬA: Dùng PhotoDetailPage.path thay vì string
               onTap: () => routeTo(PhotoDetailPage.path, data: photo),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: kSpacingSmall, horizontal: kSpacingMedium),

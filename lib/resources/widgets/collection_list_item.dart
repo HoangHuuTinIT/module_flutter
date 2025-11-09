@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/collection.dart';
 

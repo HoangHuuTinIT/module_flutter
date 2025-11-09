@@ -1,5 +1,3 @@
-// lib/app/networking/api_service.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -8,7 +6,6 @@ import '../models/collection.dart';
 import '../models/photo.dart';
 import '../models/photo_response.dart';
 import '../models/user_detail.dart';
-// IMPORT INTERCEPTOR MỚI
 import 'dio/interceptors/error_logging_interceptor.dart';
 
 class ApiService extends NyApiService {
@@ -27,12 +24,9 @@ class ApiService extends NyApiService {
     if (getEnv('APP_DEBUG') == true) {
       _dio.interceptors.add(PrettyDioLogger());
     }
-
-    // ĐÃ THÊM: Thêm interceptor log lỗi
     _dio.interceptors.add(ErrorLoggingInterceptor());
   }
 
-  // ĐÃ SỬA: Xóa try-catch, để hàm ném lỗi
   Future<PhotoResponse?> fetchPhotos({String? url}) async {
     final dio_instance.Response response;
     if (url != null) {
@@ -68,7 +62,6 @@ class ApiService extends NyApiService {
     return PhotoResponse(photos: photos, nextPageUrl: nextPageUrl);
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<Photo?> fetchPhotoDetails(String photoId) async {
     final response = await _dio.get(
       "/photos/$photoId",
@@ -79,7 +72,6 @@ class ApiService extends NyApiService {
     return Photo.fromJson(response.data);
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<UserDetail?> fetchUserDetails(String username) async {
     final response = await _dio.get(
       "/users/$username",
@@ -90,7 +82,6 @@ class ApiService extends NyApiService {
     return UserDetail.fromJson(response.data);
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<List<Photo>?> fetchUserPhotos(String username, {int page = 1}) async {
     final response = await _dio.get(
       "/users/$username/photos",
@@ -103,7 +94,6 @@ class ApiService extends NyApiService {
     return List.from(response.data).map((json) => Photo.fromJson(json)).toList();
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<List<Photo>?> fetchUserLikes(String username, {int page = 1}) async {
     final response = await _dio.get(
       "/users/$username/likes",
@@ -116,7 +106,6 @@ class ApiService extends NyApiService {
     return List.from(response.data).map((json) => Photo.fromJson(json)).toList();
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<List<Collection>?> fetchUserCollections(String username, {int page = 1}) async {
     final response = await _dio.get(
       "/users/$username/collections",
@@ -129,7 +118,6 @@ class ApiService extends NyApiService {
     return List.from(response.data).map((json) => Collection.fromJson(json)).toList();
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<List<Collection>?> fetchAllCollections({int page = 1}) async {
     final response = await _dio.get(
       "/collections",
@@ -144,7 +132,6 @@ class ApiService extends NyApiService {
         .toList();
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<List<Photo>?> fetchPhotosForCollection(String collectionId, {int page = 1}) async {
     final response = await _dio.get(
       "/collections/$collectionId/photos",
@@ -157,7 +144,6 @@ class ApiService extends NyApiService {
     return List.from(response.data).map((json) => Photo.fromJson(json)).toList();
   }
 
-  // ĐÃ SỬA: Xóa try-catch
   Future<Collection?> fetchCollectionDetails(String collectionId) async {
     final response = await _dio.get(
       "/collections/$collectionId",

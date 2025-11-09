@@ -1,12 +1,9 @@
-// lib/resources/pages/collections_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/controllers/collections_controller.dart';
-import '../../app/models/collection.dart';
 import '../widgets/home_collection_item.dart';
-import '../../app/states/collections_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/collections_state.dart';
 
 class CollectionsPage extends NyStatefulWidget<CollectionsController> {
   CollectionsPage({super.key}) : super(child: () => _CollectionsPageState());
@@ -37,12 +34,9 @@ class _CollectionsPageState extends NyPage<CollectionsPage> {
 
   @override
   Widget view(BuildContext context) {
-    // ĐÃ SỬA: Chỉ dùng 1 ValueListenableBuilder
     return ValueListenableBuilder<CollectionsState>(
         valueListenable: widget.controller.collectionsState,
         builder: (context, state, _) {
-
-          // Hiển thị lỗi
           if (state.errorMessage != null && !state.isLoading) {
             return Center(
               child: Padding(
@@ -55,8 +49,6 @@ class _CollectionsPageState extends NyPage<CollectionsPage> {
               ),
             );
           }
-
-          // Logic kiểm tra loading ban đầu
           if (state.isLoading) {
             return Center(
               child: LoadingAnimationWidget.fourRotatingDots(
@@ -65,8 +57,6 @@ class _CollectionsPageState extends NyPage<CollectionsPage> {
               ),
             );
           }
-
-          // Danh sách rỗng
           if (state.collections.isEmpty && !state.isLoadingMore) {
             return Center(child: Text("No collections found."));
           }

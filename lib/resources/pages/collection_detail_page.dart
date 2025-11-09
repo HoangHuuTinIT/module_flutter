@@ -1,14 +1,11 @@
-// lib/resources/pages/collection_detail_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/collection_detail_controller.dart';
 import '../../app/models/collection.dart';
-import '../../app/models/photo.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/photo_list_item.dart';
-import '../../app/states/collection_detail_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/collection_detail_state.dart';
 
 class CollectionDetailPage extends NyStatefulWidget<CollectionDetailController> {
   static RouteView path = ("/collection-detail", (_) => CollectionDetailPage());
@@ -48,7 +45,6 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        // ... (AppBar giữ nguyên) ...
         backgroundColor: Colors.white,
         elevation: 1,
         leading: const BackButton(color: Colors.black),
@@ -65,12 +61,9 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
           ),
         ],
       ),
-      // ĐÃ SỬA: Dùng 1 ValueListenableBuilder
       body: ValueListenableBuilder<CollectionDetailState>(
         valueListenable: controller.detailState,
         builder: (context, state, _) {
-
-          // Hiển thị lỗi
           if (state.errorMessage != null && !state.isLoading) {
             return Center(
               child: Padding(
@@ -83,11 +76,9 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
               ),
             );
           }
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ĐÃ SỬA: Đọc state.detailedCollection
               if (state.detailedCollection?.description != null &&
                   state.detailedCollection!.description!.isNotEmpty)
                 Padding(
@@ -101,7 +92,6 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
                   ),
                 ),
               Padding(
-                // ... (Padding Text.rich giữ nguyên) ...
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
                   child: Text.rich(
@@ -124,7 +114,6 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
                 ),
               ),
               Expanded(
-                // ĐÃ SỬA: Đọc state.isLoading
                 child: state.isLoading
                     ? Center(
                   child: LoadingAnimationWidget.fourRotatingDots(
@@ -132,12 +121,10 @@ class _CollectionDetailPageState extends NyPage<CollectionDetailPage> {
                     size: 50,
                   ),
                 )
-                // ĐÃ SỬA: Đọc state.photos
                     : state.photos.isEmpty
                     ? const EmptyStateWidget()
                     : ListView.builder(
                   controller: _scrollController,
-                  // ĐÃ SỬA: Đọc state.photos.length và state.isLoadingMore
                   itemCount: state.photos.length +
                       (state.isLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {

@@ -1,12 +1,10 @@
-// lib/resources/pages/photo_detail_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import '../../app/controllers/photo_detail_page_controller.dart';
 import '../../app/models/photo.dart';
 import '../widgets/photo_info_section.dart';
-import '../../app/states/photo_detail_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/photo_detail_state.dart';
 
 class PhotoDetailPage extends NyStatefulWidget<PhotoDetailPageController> {
   static RouteView path = ("/photo-detail", (_) => PhotoDetailPage());
@@ -28,7 +26,6 @@ class _PhotoDetailPageState extends NyPage<PhotoDetailPage> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        // ... (AppBar giữ nguyên) ...
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const BackButton(color: Colors.white),
@@ -56,7 +53,6 @@ class _PhotoDetailPageState extends NyPage<PhotoDetailPage> {
                   if (initialPhoto.blurHash != null)
                     BlurHash(hash: initialPhoto.blurHash!),
                   Image.network(
-                    // ... (Image.network giữ nguyên) ...
                     initialPhoto.urls?.regular ?? "",
                     fit: BoxFit.cover,
                     frameBuilder:
@@ -77,12 +73,9 @@ class _PhotoDetailPageState extends NyPage<PhotoDetailPage> {
                       );
                     },
                   ),
-
-                  // ĐÃ SỬA: Lắng nghe PhotoDetailState
                   ValueListenableBuilder<PhotoDetailState>(
                     valueListenable: widget.controller.photoState,
                     builder: (context, state, child) {
-                      // Đọc location từ state
                       if (state.photo?.location?.displayName == null) {
                         return const SizedBox.shrink();
                       }

@@ -1,5 +1,3 @@
-// lib/app/controllers/collection_detail_state.dart
-
 import 'package:flutter_module_4/app/models/collection.dart';
 import 'package:flutter_module_4/app/models/photo.dart';
 

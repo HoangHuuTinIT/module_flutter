@@ -1,10 +1,8 @@
-// lib/app/controllers/photo_detail_state.dart
-
 import 'package:flutter_module_4/app/models/photo.dart';
 
 class PhotoDetailState {
-  final Photo? photo; // Sẽ chứa cả initial và full detail photo
-  final bool hasLoadedDetails; // Dùng cho AnimatedSwitcher
+  final Photo? photo;
+  final bool hasLoadedDetails;
   final String? errorMessage;
 
   PhotoDetailState({

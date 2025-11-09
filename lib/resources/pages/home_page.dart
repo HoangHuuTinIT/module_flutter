@@ -3,12 +3,11 @@ import 'package:flutter/rendering.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/home_controller.dart';
-import '../../app/models/photo.dart';
 import '../../app/constants/app_dimensions.dart';
 import '../widgets/animated_circular_notch.dart';
 import '../widgets/photo_list_item.dart';
 import 'collections_page.dart';
-import '../../app/states/home_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/home_state.dart';
 
 class HomePage extends NyStatefulWidget<HomeController> {
   static RouteView path = ("/home", (_) => HomePage());
@@ -17,7 +16,6 @@ class HomePage extends NyStatefulWidget<HomeController> {
 }
 
 class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
-  // ... (code initState, dispose, _handleScroll v.v. giữ nguyên) ...
   late TabController _tabController;
   final ScrollController _homeScrollController = ScrollController();
   late AnimationController _bottomNavBarAnimationController;
@@ -80,7 +78,6 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget view(BuildContext context) {
-    // ... (code tính toán kích thước, Scaffold, AppBar, FAB, BottomNavBar giữ nguyên) ...
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
@@ -126,7 +123,6 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
         controller: _tabController,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          // ĐÃ SỬA: Chỉ dùng 1 ValueListenableBuilder
           ValueListenableBuilder<HomeState>(
             valueListenable: widget.controller.homeState,
             builder: (context, state, child) {
@@ -212,12 +208,9 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  // ĐÃ SỬA: Hàm này nhận vào HomeState
   Widget _buildHomeTabBody(HomeState state) {
     final listVerticalPadding = kSpacingLarge;
     final listBottomPadding = _bottomNavBarHeight + kSpacingXLarge;
-
-    // Hiển thị lỗi
     if (state.errorMessage != null && !state.isRefreshing) {
       return Center(
         child: Padding(
@@ -230,8 +223,6 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
         ),
       );
     }
-
-    // Hiển thị loading ban đầu
     if (state.photos.isEmpty && !state.isLoadingMore && state.errorMessage == null) {
       return Center(
         child: LoadingAnimationWidget.fourRotatingDots(
@@ -240,8 +231,6 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
         ),
       );
     }
-
-    // Hiển thị danh sách (có thể đang refresh)
     Widget listView = ListView.builder(
       padding:
       EdgeInsets.only(bottom: listBottomPadding, top: listVerticalPadding),
@@ -258,8 +247,6 @@ class _HomePageState extends NyPage<HomePage> with TickerProviderStateMixin {
         return PhotoListItem(photo: photo);
       },
     );
-
-    // Bọc danh sách bằng RefreshIndicator
     return RefreshIndicator(
       onRefresh: widget.controller.onRefresh,
       child: listView,

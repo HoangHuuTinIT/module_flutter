@@ -1,11 +1,7 @@
-// lib/resources/widgets/photo_list_item.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
-
 import '../../app/models/photo.dart';
-// IMPORT MỚI
 import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/user_profile_page.dart';
 import '../../resources/pages/photo_detail_page.dart';
@@ -30,7 +26,6 @@ class PhotoListItem extends StatelessWidget {
           GestureDetector(
             onTap: () {
               if (photo.user?.username != null) {
-                // ĐÃ SỬA: Dùng UserProfilePage.path thay vì string
                 routeTo(UserProfilePage.path, data: photo.user!.username);
               }
             },
@@ -58,7 +53,6 @@ class PhotoListItem extends StatelessWidget {
             ),
           ),
           InkWell(
-            // ĐÃ SỬA: Dùng PhotoDetailPage.path thay vì string
             onTap: () => routeTo(PhotoDetailPage.path, data: photo),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(kBorderRadiusMedium),

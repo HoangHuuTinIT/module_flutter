@@ -82,7 +82,7 @@ class Photo extends Model {
     if (width != null && height != null && height! > 0 && width! > 0) {
       return width! / height!;
     }
-    return 16 / 9; // Giá trị mặc định
+    return 16 / 9;
   }
 }
 

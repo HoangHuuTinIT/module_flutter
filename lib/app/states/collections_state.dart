@@ -1,16 +1,14 @@
-// lib/app/controllers/collections_state.dart
-
 import 'package:flutter_module_4/app/models/collection.dart';
 
 class CollectionsState {
   final List<Collection> collections;
-  final bool isLoading; // Loading ban đầu
+  final bool isLoading;
   final bool isLoadingMore;
   final String? errorMessage;
 
   CollectionsState({
     this.collections = const [],
-    this.isLoading = true, // Mặc định là true khi mới vào
+    this.isLoading = true,
     this.isLoadingMore = false,
     this.errorMessage,
   });

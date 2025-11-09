@@ -1,5 +1,3 @@
-// lib/app/controllers/collections_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/collection.dart';
@@ -68,22 +66,19 @@ class CollectionsController extends Controller {
             collectionsState.value.copyWith(isLoadingMore: false);
       }
     } catch (e) {
-      // ĐÃ SỬA: Xử lý lỗi khi tải thêm
       _hasMoreCollections = false;
       collectionsState.value =
           collectionsState.value.copyWith(isLoadingMore: false);
-      // CÁCH SỬA ĐÚNG:
-      showToastNotification(
-        // Tạo một đối tượng ToastMeta kiểu danger
-        ToastMeta.danger(
+      if (context != null) {
+        showToastNotification(
+          context!,
+          style: ToastNotificationStyleType.danger,
           title: "Lỗi",
-          description: "Không thể tải thêm.",
-        ) as BuildContext,
-      );
+          description: "Không thể tải thêm. Vui lòng thử lại sau.",
+        );
+      }
     }
   }
-
-  // ... (handleCollectionsScroll giữ nguyên) ...
   void handleCollectionsScroll(ScrollController scrollController) {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent * 0.9) {

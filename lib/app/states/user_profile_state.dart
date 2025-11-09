@@ -1,10 +1,7 @@
-// lib/app/controllers/user_profile_state.dart
-
 import 'package:flutter_module_4/app/models/collection.dart';
 import 'package:flutter_module_4/app/models/photo.dart';
 import 'package:flutter_module_4/app/models/user_detail.dart';
 
-// Lớp này chứa TOÀN BỘ trạng thái cho trang UserProfile
 class UserProfileState {
   final bool isUserLoading;
   final bool isTabsLoading;
@@ -12,8 +9,6 @@ class UserProfileState {
   final List<Photo> userPhotos;
   final List<Photo> likedPhotos;
   final List<Collection> collections;
-
-  // Trạng thái load-more cho từng tab
   final bool isLoadingMoreUserPhotos;
   final bool isLoadingMoreLikedPhotos;
   final bool isLoadingMoreCollections;
@@ -30,13 +25,9 @@ class UserProfileState {
     this.isLoadingMoreCollections = false,
     this.errorMessage,
   });
-
-  // Hàm reset về trạng thái ban đầu
   UserProfileState reset() {
-    return UserProfileState(); // Trả về một state hoàn toàn mới
+    return UserProfileState();
   }
-
-  // Hàm copyWith để tạo state mới dựa trên state cũ
   UserProfileState copyWith({
     bool? isUserLoading,
     bool? isTabsLoading,

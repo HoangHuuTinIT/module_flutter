@@ -1,21 +1,17 @@
-// lib/app/controllers/photo_detail_page_controller.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/photo.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
-import '../states/photo_detail_state.dart'; // IMPORT STATE MỚI
+import '../states/photo_detail_state.dart';
 
 class PhotoDetailPageController extends Controller {
 
-  // ĐÃ SỬA: Dùng một State Object duy nhất
   final ValueNotifier<PhotoDetailState> photoState =
   ValueNotifier(PhotoDetailState());
 
   void setupInitial(dynamic data) {
     if (data is Photo) {
-      // Set ảnh ban đầu (chưa có EXIF)
       photoState.value = photoState.value.copyWith(photo: data);
     }
   }
@@ -37,7 +33,7 @@ class PhotoDetailPageController extends Controller {
       }
     } catch(e) {
       photoState.value = photoState.value.copyWith(
-          hasLoadedDetails: true, // Vẫn set là true để dừng skeleton
+          hasLoadedDetails: true,
           errorMessage: "Không thể tải chi tiết ảnh."
       );
     }
