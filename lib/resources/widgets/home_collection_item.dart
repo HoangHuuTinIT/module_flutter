@@ -6,7 +6,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/collection.dart';
 // IMPORT MỚI
-import '../../constants/app_dimensions.dart';
+import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/collection_detail_page.dart';
 import '../../resources/pages/user_profile_page.dart';
 

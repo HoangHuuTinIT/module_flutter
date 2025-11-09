@@ -6,7 +6,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/controllers/collections_controller.dart';
 import '../../app/models/collection.dart';
 import '../widgets/home_collection_item.dart';
-import '../../app/controllers/collections_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/collections_state.dart'; // IMPORT STATE MỚI
 
 class CollectionsPage extends NyStatefulWidget<CollectionsController> {
   CollectionsPage({super.key}) : super(child: () => _CollectionsPageState());

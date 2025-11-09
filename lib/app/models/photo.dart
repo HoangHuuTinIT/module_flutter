@@ -78,6 +78,12 @@ class Photo extends Model {
     "color": color,
     "blur_hash": blurHash,
   };
+  double get aspectRatio {
+    if (width != null && height != null && height! > 0 && width! > 0) {
+      return width! / height!;
+    }
+    return 16 / 9; // Giá trị mặc định
+  }
 }
 
 

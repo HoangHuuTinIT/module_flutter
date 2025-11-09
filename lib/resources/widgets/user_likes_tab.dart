@@ -5,7 +5,7 @@ import 'package:flutter_module_4/resources/widgets/photo_list_item.dart';
 
 import '../../app/controllers/user_profile_controller.dart';
 // IMPORT STATE MỚI
-import '../../app/controllers/user_profile_state.dart';
+import '../../app/states/user_profile_state.dart';
 import '../../app/models/photo.dart';
 
 class UserLikesTab extends StatefulWidget {

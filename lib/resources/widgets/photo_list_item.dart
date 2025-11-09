@@ -6,7 +6,7 @@ import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../app/models/photo.dart';
 // IMPORT MỚI
-import '../../constants/app_dimensions.dart';
+import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/user_profile_page.dart';
 import '../../resources/pages/photo_detail_page.dart';
 
@@ -18,11 +18,6 @@ class PhotoListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final double aspectRatio = (photo.width != null &&
-        photo.height != null &&
-        photo.height! > 0)
-        ? photo.width! / photo.height!
-        : 16 / 9;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -68,7 +63,7 @@ class PhotoListItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(kBorderRadiusMedium),
               child: AspectRatio(
-                aspectRatio: aspectRatio,
+                aspectRatio: photo.aspectRatio,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [

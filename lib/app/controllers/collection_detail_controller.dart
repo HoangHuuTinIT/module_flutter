@@ -6,12 +6,10 @@ import '../models/collection.dart';
 import '../models/photo.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
-import 'collection_detail_state.dart'; // IMPORT STATE MỚI
+import '../states/collection_detail_state.dart';
 
 class CollectionDetailController extends Controller {
   Collection? initialCollection;
-
-  // ĐÃ SỬA: Dùng một State Object duy nhất
   final ValueNotifier<CollectionDetailState> detailState =
   ValueNotifier(CollectionDetailState());
 
@@ -82,11 +80,21 @@ class CollectionDetailController extends Controller {
         detailState.value = detailState.value.copyWith(isLoadingMore: false);
       }
     } catch(e) {
+      // ĐÃ SỬA: Xử lý lỗi khi tải thêm
       _hasMore = false;
       detailState.value = detailState.value.copyWith(isLoadingMore: false);
+      // CÁCH SỬA ĐÚNG:
+      showToastNotification(
+        // Tạo một đối tượng ToastMeta kiểu danger
+        ToastMeta.danger(
+          title: "Lỗi",
+          description: "Không thể tải thêm.",
+        ) as BuildContext,
+      );
     }
   }
 
+  // ... (handleScroll giữ nguyên) ...
   void handleScroll(ScrollController scrollController) {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent * 0.9) {

@@ -6,7 +6,7 @@ import 'package:flutter_blurhash/flutter_blurhash.dart';
 import '../../app/controllers/photo_detail_page_controller.dart';
 import '../../app/models/photo.dart';
 import '../widgets/photo_info_section.dart';
-import '../../app/controllers/photo_detail_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/photo_detail_state.dart'; // IMPORT STATE MỚI
 
 class PhotoDetailPage extends NyStatefulWidget<PhotoDetailPageController> {
   static RouteView path = ("/photo-detail", (_) => PhotoDetailPage());

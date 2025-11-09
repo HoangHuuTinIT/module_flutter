@@ -5,7 +5,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '../models/photo.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
-import 'photo_detail_state.dart'; // IMPORT STATE MỚI
+import '../states/photo_detail_state.dart'; // IMPORT STATE MỚI
 
 class PhotoDetailPageController extends Controller {
 

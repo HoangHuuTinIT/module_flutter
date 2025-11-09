@@ -8,7 +8,7 @@ import '../../app/models/collection.dart';
 import '../../app/models/photo.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/photo_list_item.dart';
-import '../../app/controllers/collection_detail_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/collection_detail_state.dart'; // IMPORT STATE MỚI
 
 class CollectionDetailPage extends NyStatefulWidget<CollectionDetailController> {
   static RouteView path = ("/collection-detail", (_) => CollectionDetailPage());

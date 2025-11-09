@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/user_profile_controller.dart';
+import '../../app/helpers/formatters.dart';
 import '../../app/models/user_detail.dart';
-import '../../app/controllers/user_profile_state.dart';
-import '../../constants/app_dimensions.dart';
+import '../../app/states/user_profile_state.dart';
+import '../../app/constants/app_dimensions.dart';
 import '../widgets/user_collections_tab.dart';
 import '../widgets/user_likes_tab.dart';
 import '../widgets/user_photos_tab.dart';
@@ -211,7 +212,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          _formatNumber(count),
+          Formatters.formatNumber(count),
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: kSpacingExtraSmall),
@@ -223,12 +224,7 @@ class _UserProfilePageState extends NyPage<UserProfilePage> {
     );
   }
 
-  String _formatNumber(int number) {
-    if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    }
-    return number.toString();
-  }
+
 
 }
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {

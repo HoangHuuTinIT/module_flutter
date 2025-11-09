@@ -4,11 +4,11 @@ import 'package:nylo_framework/nylo_framework.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../app/controllers/home_controller.dart';
 import '../../app/models/photo.dart';
-import '../../constants/app_dimensions.dart';
+import '../../app/constants/app_dimensions.dart';
 import '../widgets/animated_circular_notch.dart';
 import '../widgets/photo_list_item.dart';
 import 'collections_page.dart';
-import '../../app/controllers/home_state.dart'; // IMPORT STATE MỚI
+import '../../app/states/home_state.dart'; // IMPORT STATE MỚI
 
 class HomePage extends NyStatefulWidget<HomeController> {
   static RouteView path = ("/home", (_) => HomePage());

@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../../app/controllers/user_profile_controller.dart';
-import '../../app/controllers/user_profile_state.dart';
+import '../../app/states/user_profile_state.dart';
 import '../../app/helpers/ui_helpers.dart';
 import '../../app/models/photo.dart';
 // IMPORT MỚI
+import '../../app/constants/app_dimensions.dart';
 import '../../resources/pages/photo_detail_page.dart';
 
 
@@ -58,33 +59,28 @@ class _UserPhotosTabState extends State<UserPhotosTab> {
 
         return ListView.builder(
           controller: _scrollController,
-          padding: EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: kSpacingSmall),
           itemCount: photos.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index >= photos.length) {
               return Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(kSpacingLarge),
                 child: Center(child: CircularProgressIndicator(color: Colors.black)),
               );
             }
 
             final photo = photos[index];
-            final double aspectRatio = (photo.width != null &&
-                photo.height != null &&
-                photo.height! > 0)
-                ? photo.width! / photo.height!
-                : 16 / 9;
 
             // BỌC PADDING BẰNG GESTUREDETECTOR
             return GestureDetector(
               // ĐÃ SỬA: Dùng PhotoDetailPage.path thay vì string
               onTap: () => routeTo(PhotoDetailPage.path, data: photo),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: kSpacingSmall, horizontal: kSpacingMedium),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(kBorderRadiusMedium),
                   child: AspectRatio(
-                    aspectRatio: aspectRatio,
+                    aspectRatio: photo.aspectRatio,
                     child: NetworkImageWithPlaceholder(
                       imageUrl: photo.urls?.regular ?? photo.urls?.small ?? "",
                       placeholderColorHex: photo.color,

@@ -6,9 +6,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 import '../../app/controllers/photo_detail_page_controller.dart';
+import '../../app/helpers/formatters.dart';
 import '../../app/models/photo.dart';
-import '../../app/controllers/photo_detail_state.dart';
-import '../../constants/app_dimensions.dart'; // IMPORT STATE MỚI
+import '../../app/states/photo_detail_state.dart';
+import '../../app/constants/app_dimensions.dart'; // IMPORT STATE MỚI
 
 class PhotoInfoSection extends StatefulWidget {
   final PhotoDetailPageController controller;
@@ -242,19 +243,14 @@ class _PhotoInfoSectionState extends State<PhotoInfoSection> {
   }
 
   Widget _buildPhotoStats(BuildContext context, Photo photo) {
-    String formatNumber(num? value) {
-      if (value == null) return "0";
-      return value < 1000
-          ? value.toStringAsFixed(0)
-          : "${(value / 1000).toStringAsFixed(1)}K";
-    }
+
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildStatItem("Views", formatNumber(photo.views)),
-        _buildStatItem("Downloads", formatNumber(photo.downloads)),
-        _buildStatItem("Likes", formatNumber(photo.likes)),
+        _buildStatItem("Views", Formatters.formatNumber(photo.views)),
+        _buildStatItem("Downloads", Formatters.formatNumber(photo.downloads)),
+        _buildStatItem("Likes", Formatters.formatNumber(photo.likes)),
       ],
     );
   }

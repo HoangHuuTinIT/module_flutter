@@ -1,21 +1,21 @@
+// lib/app/controllers/home_controller.dart
+
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import '../models/photo.dart';
 import '../models/photo_response.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
-import 'home_state.dart'; // IMPORT STATE MỚI
+import '../states/home_state.dart';
 
 class HomeController extends Controller {
   HomeController();
 
-  // ĐÃ SỬA: Dùng một State Object duy nhất
   final ValueNotifier<HomeState> homeState = ValueNotifier(HomeState());
 
   String? _nextPageUrl;
 
   Future<void> fetchInitialPhotos() async {
-    // Reset state về refreshing
     homeState.value = homeState.value.copyWith(isRefreshing: true, errorMessage: null);
 
     try {
@@ -51,13 +51,27 @@ class HomeController extends Controller {
           photos: List.from(homeState.value.photos)..addAll(response.photos),
           isLoadingMore: false,
         );
+      } else {
+        // Nếu response là null (ít xảy ra vì ApiService ném lỗi)
+        _nextPageUrl = null;
+        homeState.value = homeState.value.copyWith(isLoadingMore: false);
       }
     } catch (e) {
-      // Có thể hiển thị lỗi tinh tế hơn (ví dụ: SnackBar) thay vì ghi đè errorMessage
+      // ĐÃ SỬA: Xử lý lỗi khi tải thêm
+      _nextPageUrl = null; // Dừng tải thêm
       homeState.value = homeState.value.copyWith(isLoadingMore: false);
+      // CÁCH SỬA ĐÚNG:
+      showToastNotification(
+        // Tạo một đối tượng ToastMeta kiểu danger
+        ToastMeta.danger(
+          title: "Lỗi",
+          description: "Không thể tải thêm.",
+        ) as BuildContext,
+      );
     }
   }
 
+  // ... (các hàm onRefresh, scrollToTop giữ nguyên) ...
   Future<void> onRefresh() async {
     if (homeState.value.isRefreshing) return;
     await fetchInitialPhotos();

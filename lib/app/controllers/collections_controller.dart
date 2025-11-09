@@ -5,12 +5,11 @@ import 'package:nylo_framework/nylo_framework.dart';
 import '../models/collection.dart';
 import '../networking/api_service.dart';
 import 'controller.dart';
-import 'collections_state.dart'; // IMPORT STATE MỚI
+import '../states/collections_state.dart';
 
 class CollectionsController extends Controller {
   CollectionsController();
 
-  // ĐÃ SỬA: Dùng một State Object duy nhất
   final ValueNotifier<CollectionsState> collectionsState =
   ValueNotifier(CollectionsState());
 
@@ -18,7 +17,6 @@ class CollectionsController extends Controller {
   bool _hasMoreCollections = true;
 
   Future<void> fetchInitialCollections() async {
-    // Set state về loading ban đầu
     collectionsState.value = collectionsState.value.copyWith(isLoading: true, errorMessage: null);
     _allCollectionsPage = 1;
     _hasMoreCollections = true;
@@ -70,12 +68,22 @@ class CollectionsController extends Controller {
             collectionsState.value.copyWith(isLoadingMore: false);
       }
     } catch (e) {
-      _hasMoreCollections = false; // Dừng việc tải thêm nếu có lỗi
+      // ĐÃ SỬA: Xử lý lỗi khi tải thêm
+      _hasMoreCollections = false;
       collectionsState.value =
           collectionsState.value.copyWith(isLoadingMore: false);
+      // CÁCH SỬA ĐÚNG:
+      showToastNotification(
+        // Tạo một đối tượng ToastMeta kiểu danger
+        ToastMeta.danger(
+          title: "Lỗi",
+          description: "Không thể tải thêm.",
+        ) as BuildContext,
+      );
     }
   }
 
+  // ... (handleCollectionsScroll giữ nguyên) ...
   void handleCollectionsScroll(ScrollController scrollController) {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent * 0.9) {

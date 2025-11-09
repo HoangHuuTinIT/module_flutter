@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../constants/app_dimensions.dart';
+import '../../app/constants/app_dimensions.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final String message;
